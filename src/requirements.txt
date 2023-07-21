@@ -1,2 +1,2 @@
-microsoft-teams-webhook
+microsoft_teams_webhook
 pymsteams
