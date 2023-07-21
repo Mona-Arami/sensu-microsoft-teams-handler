@@ -30,7 +30,7 @@ import re
 import sys
 import json
 from datetime import datetime
-from microsoft-teams_webhook import MicrosoftTeams
+from microsoft_teams_webhook import MicrosoftTeams
 
 now = datetime.now()
 
