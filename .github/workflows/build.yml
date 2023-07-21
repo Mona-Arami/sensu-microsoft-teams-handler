@@ -41,7 +41,7 @@ jobs:
           tag_name: ${{ github.ref_name }}
           body_path: CHANGELOG.md
         env:
-          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ new }}
 
       - name: upload artifacts
         uses: softprops/action-gh-release@v1
