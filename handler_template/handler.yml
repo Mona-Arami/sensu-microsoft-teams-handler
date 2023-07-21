@@ -1,0 +1,17 @@
+type: Handler
+api_version: core/v2
+metadata:
+  name: microsoft-teams
+spec:
+  runtime_assets:
+    - ?
+    - jspaleta/sensu-python-runtime
+  command: microsoft_teams.py
+  env_vars:
+    - ?
+  filters:
+    - is_incident
+    - not_silenced
+    - not_flapping
+    - fatigue_check
+  type: pipe
