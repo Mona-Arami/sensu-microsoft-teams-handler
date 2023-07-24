@@ -2,9 +2,7 @@ name: Package Sensu Asset
 
 on:
   workflow_dispatch:
-  push:
-    tags:
-      - '*'
+
 
 jobs:
   build-and-publish:
