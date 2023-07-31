@@ -1,4 +1,7 @@
+from urllib.request import Request, urlopen
+import json
 import pymsteams
+from __future__ import annotations
 
 class MicrosoftTeams:
     def __init__(self, url):
