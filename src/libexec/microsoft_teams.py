@@ -34,6 +34,7 @@ from microsoft_teams_webhook import MicrosoftTeams
 
 now = datetime.now()
 
+
 config = {
     "webhook_url": os.environ.get('TEST_WEBHOOK_URL'),
     "sensu_url": os.environ.get('SENSU_BASE_URL'),
@@ -245,6 +246,7 @@ def main():
     for line in sys.stdin.readlines():
         data += "".join(line.strip())
     obj = json.loads(data)
+    print(obj)
 
     channel = get_channel(obj['entity']['metadata'])
     namespace = obj['entity']['metadata']['namespace']
