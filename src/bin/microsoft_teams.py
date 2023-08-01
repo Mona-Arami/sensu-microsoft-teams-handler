@@ -5,7 +5,7 @@ SCRIPT=$(readlink -f $0)
 # Absolute path this script is in. /home/user/bin
 SCRIPTPATH=`dirname $SCRIPT`
 asset_path=$(dirname -- ${SCRIPTPATH})
-
+print("asset_path","-------------", asset_path)
 # Prepend relative library path to PYTHONPATH
 # to ensure modules are found.
 export PYTHONPATH="${asset_path}/lib:$PYTHONPATH"
