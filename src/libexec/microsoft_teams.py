@@ -31,7 +31,19 @@ import sys
 import json
 
 from datetime import datetime
-from microsoft_teams_webhook import MT
+from urllib.request import Request
+import pymsteams
+
+
+class MT:
+    def __init__(self, url):
+        self.url = url
+    def messages(self,title,text,icon_url):
+        myTeamsMessage = pymsteams.connectorcard(self.url)
+        myTeamsMessage.title(title)
+        myTeamsMessage.text(icon_url+text)
+        return myTeamsMessage.send()
+# from microsoft_teams_webhook.microsoft_teams_webhook import MT
 
 now = datetime.now()
 
