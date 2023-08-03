@@ -1,1 +1,0 @@
-from pymsteams.pymsteams import ConnectorCard
