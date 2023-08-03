@@ -31,20 +31,9 @@ import sys
 import json
 
 from datetime import datetime
-from urllib.request import Request
-import pymsteams
 
-
-class MT:
-    def __init__(self, url):
-        self.url = url
-    def messages(self,title,text,icon_url):
-        myTeamsMessage = pymsteams.connectorcard(self.url)
-        myTeamsMessage.title(title)
-        myTeamsMessage.text(icon_url+text)
-        return myTeamsMessage.send()
-# from microsoft_teams_webhook.microsoft_teams_webhook import MT
-
+# from pymsteams import MT
+from pymsteams import ConnectorCard
 now = datetime.now()
 
 config = {
@@ -320,12 +309,17 @@ def main():
     """
     Post to Microsoft Teams
     """
-    class_microsofteams = MT(url=config['webhook_url'])
-    class_microsofteams.messages(
-        title = "title",
-        text = message,
-        icon_url = config['icon_url']
-    )
+    # class_microsofteams = MT(url=config['webhook_url'])
+    # class_microsofteams.messages(
+    #     title = "title",
+    #     text = message,
+    #     icon_url = config['icon_url']
+    # )
+    print("web_url:",  config['webhook_url'])
+
+    myTeamsMessage = ConnectorCard(url=config['webhook_url'])
+    myTeamsMessage.text("this is my test message to the teams channel.")
+    myTeamsMessage.send()
 
 if __name__ == '__main__':
     main()
