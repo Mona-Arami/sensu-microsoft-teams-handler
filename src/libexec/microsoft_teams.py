@@ -35,15 +35,13 @@ from datetime import datetime
 
 import requests
 
-WEBHOOK_URL = "https://doimspp.webhook.office.com/webhookb2/c10a30a4-9b29-45ba-8f83-b2d5db3e2283@0693b5ba-4b18-4d7b-9341-f32f400a5494/IncomingWebhook/6a63494432cf4ac2af04970036ecba22/4642816a-abb2-426f-bffa-532f047efc62"
 
-def postTeamsMessage(text):
+def postTeamsMessage(text,WEBHOOK_URL):
         jsonData = {
           "text": text
         }
         requests.post(WEBHOOK_URL, json=jsonData)
 
-postTeamsMessage("SAS sensu webhooks testing")
 
 # from pymsteams import MT
 # from pymsteams.pymsteams import ConnectorCard
@@ -333,6 +331,7 @@ def main():
     # myTeamsMessage = ConnectorCard(url=config['webhook_url'])
     # myTeamsMessage.text("this is my test message to the teams channel.")
     # myTeamsMessage.send()
+postTeamsMessage("SAS sensu webhooks testing", config['webhook_url'])
 
 if __name__ == '__main__':
     main()
