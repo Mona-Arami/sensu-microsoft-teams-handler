@@ -1,4 +1,2 @@
 requests>=2.20.0
-
-[async]
 httpx>=0.18.2
