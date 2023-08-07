@@ -33,18 +33,8 @@ import json
 from datetime import datetime
 
 
-import requests
+import pymsteams
 
-
-def postTeamsMessage(text,WEBHOOK_URL):
-        jsonData = {
-          "text": text
-        }
-        requests.post(WEBHOOK_URL, json=jsonData)
-
-
-# from pymsteams import MT
-# from pymsteams.pymsteams import ConnectorCard
 now = datetime.now()
 
 config = {
@@ -327,11 +317,11 @@ def main():
     #     icon_url = config['icon_url']
     # )
     print("web_url:",  config['webhook_url'])
+    url = config['webhook_url']
 
-    # myTeamsMessage = ConnectorCard(url=config['webhook_url'])
-    # myTeamsMessage.text("this is my test message to the teams channel.")
-    # myTeamsMessage.send()
-postTeamsMessage("SAS sensu webhooks testing", config['webhook_url'])
+    myTeamsMessage = pymsteams.connectorcard(url)
+    myTeamsMessage.text("SAS Sensu alerts")
+    myTeamsMessage.send()
 
 if __name__ == '__main__':
     main()
