@@ -10,7 +10,7 @@ asset_path=$(dirname -- ${SCRIPTPATH})
 echo "asset_path=$(dirname -- ${SCRIPTPATH})"
 # Prepend relative library path to PYTHONPATH
 # to ensure modules are found.
-export PYTHONPATH="${asset_path}/lib:$PYTHONPATH"
-echo "PYTHONPATH="${asset_path}/lib:$PYTHONPATH""
+export PYTHONPATH="${asset_path}/lib"
+echo "${asset_path}/lib"
 program="${0##*/}"
 exec "${asset_path}/libexec/${program}" "$@"
