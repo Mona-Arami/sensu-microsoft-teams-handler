@@ -33,7 +33,7 @@ import json
 from datetime import datetime
 
 
-from pymsteams import connectorcard
+from lib.pymsteams import connectorcard
 
 now = datetime.now()
 
