@@ -50,7 +50,7 @@ print(sys.path.append(
     )[0]
 ))
 
-import pymsteams
+from pymsteams import connectorcard
 
 now = datetime.now()
 
@@ -336,7 +336,7 @@ def main():
     print("web_url:",  config['webhook_url'])
     url = config['webhook_url']
 
-    myTeamsMessage = pymsteams.connectorcard(url)
+    myTeamsMessage = connectorcard(url)
     myTeamsMessage.text("SAS Sensu alerts , attempt # 4 ")
     myTeamsMessage.send()
 
