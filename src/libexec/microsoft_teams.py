@@ -40,7 +40,15 @@ sys.path.append(
         )
     )[0]
 )
-
+print (sys.path)
+print("----------------")
+print(sys.path.append(
+    os.path.split(
+        os.path.dirname(
+            os.path.abspath(__file__)
+        )
+    )[0]
+))
 
 import pymsteams
 
@@ -328,7 +336,7 @@ def main():
     print("web_url:",  config['webhook_url'])
     url = config['webhook_url']
 
-    myTeamsMessage = connectorcard(url)
+    myTeamsMessage = pymsteams.connectorcard(url)
     myTeamsMessage.text("SAS Sensu alerts , attempt # 4 ")
     myTeamsMessage.send()
 
