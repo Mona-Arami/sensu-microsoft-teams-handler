@@ -31,7 +31,9 @@ import sys
 import json
 
 from datetime import datetime
-
+print("==================")
+print (sys.path)
+print("==================")
 # add scripts to the path
 sys.path.append(
     os.path.split(
@@ -40,6 +42,7 @@ sys.path.append(
         )
     )[0]
 )
+print("----------------")
 print (sys.path)
 print("----------------")
 print(sys.path.append(
@@ -49,7 +52,7 @@ print(sys.path.append(
         )
     )[0]
 ))
-
+import pymsteams
 from pymsteams import connectorcard
 
 now = datetime.now()
