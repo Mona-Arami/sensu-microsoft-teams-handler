@@ -32,9 +32,15 @@ import json
 
 from datetime import datetime
 print("==================")
-print (sys.path)
+print (os.path)
 print("==================")
 # add scripts to the path
+# PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+# BASE_DIR = os.path.dirname(PROJECT_ROOT)
+
+# parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+# sys.path.append(parentddir)
+
 sys.path.append(
     os.path.split(
         os.path.dirname(
@@ -45,14 +51,7 @@ sys.path.append(
 print("----------------")
 print (sys.path)
 print("----------------")
-print(sys.path.append(
-    os.path.split(
-        os.path.dirname(
-            os.path.abspath(__file__)
-        )
-    )[0]
-))
-import pymsteams
+
 from pymsteams import connectorcard
 
 now = datetime.now()
