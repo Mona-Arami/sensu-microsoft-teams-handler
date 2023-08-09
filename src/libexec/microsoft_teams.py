@@ -35,21 +35,14 @@ from datetime import datetime
 # add scripts to the path
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 print("PROJECT_ROOT", PROJECT_ROOT)
+sys.path.append(PROJECT_ROOT)
 
 BASE_DIR = os.path.dirname(PROJECT_ROOT)
-print("BASE_DIR", BASE_DIR)
+PYMSTEAMS_PACKAGE_DIR = BASE_DIR + "/lib/pymsteams"
+print("PYMSTEAMS_PACHAGE_DIR", PYMSTEAMS_PACKAGE_DIR)
 
-parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
-print("parentddir", parentddir)
-# sys.path.append(parentddir)
+sys.path.append(PYMSTEAMS_PACKAGE_DIR)
 
-sys.path.append(
-    os.path.split(
-        os.path.dirname(
-            os.path.abspath(__file__)
-        )
-    )[0]
-)
 print("----------------")
 print (sys.path)
 print("----------------")
