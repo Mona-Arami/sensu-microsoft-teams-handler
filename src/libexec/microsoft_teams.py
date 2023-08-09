@@ -48,7 +48,6 @@ print (sys.path)
 print("----------------")
 
 import pymsteams
-
 now = datetime.now()
 
 config = {
@@ -258,11 +257,19 @@ def main():
     """
     Load the Sensu event data (stdin)
     """
-    data = ""
-    for line in sys.stdin.readlines():
-        data += "".join(line.strip())
-    obj = json.loads(data)
-    print(obj)
+
+    with open('sample-event2.json') as f:
+        obj_all = json.load(f)
+
+
+
+    # data = ""
+    # test = '''{"SAS":"API","SDM":"API"}'''
+    # # for line in sys.stdin.readlines():
+    # for line in test:
+    #     data += "".join(line.strip())
+    # obj = json.loads(data)
+    obj = obj_all['spec']
 
     channel = get_channel(obj['entity']['metadata'])
     namespace = obj['entity']['metadata']['namespace']
@@ -331,10 +338,11 @@ def main():
     #     icon_url = config['icon_url']
     # )
     print("web_url:",  config['webhook_url'])
-    url = config['webhook_url']
+    url_ = config['webhook_url']
+    url = "https://doimspp.webhook.office.com/webhookb2/c10a30a4-9b29-45ba-8f83-b2d5db3e2283@0693b5ba-4b18-4d7b-9341-f32f400a5494/IncomingWebhook/6a63494432cf4ac2af04970036ecba22/4642816a-abb2-426f-bffa-532f047efc62"
 
     myTeamsMessage = pymsteams.connectorcard(url)
-    myTeamsMessage.text("SAS Sensu alerts , attempt # 4 ")
+    myTeamsMessage.text("SAS Sensu alerts , attempt # 5 ")
     myTeamsMessage.send()
 
 if __name__ == '__main__':
