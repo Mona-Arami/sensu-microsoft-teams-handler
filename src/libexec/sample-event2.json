@@ -1,0 +1,196 @@
+{
+    "type": "Event",
+    "api_version": "core/v2",
+    "metadata": {
+        "namespace": "dev"
+    },
+    "spec": {
+        "check": {
+            "check_hooks": null,
+            "command": "check-http.rb -u https://maps-dev.snafu.cr.usgs.gov/atbconservation/explorer/ -s --open-timeout 60 --read-timeout 60 -t 60 --dns-timeout 45 ",
+            "duration": 0.679112223,
+            "env_vars": null,
+            "executed": 1689888471,
+            "handlers": [
+                "slack",
+                "handler-microsoft-teams"
+            ],
+            "high_flap_threshold": 45,
+            "history": [
+                {
+                    "executed": 1689886669,
+                    "status": 2
+                },
+                {
+                    "executed": 1689886759,
+                    "status": 2
+                },
+                {
+                    "executed": 1689886849,
+                    "status": 2
+                },
+                {
+                    "executed": 1689886940,
+                    "status": 2
+                },
+                {
+                    "executed": 1689887030,
+                    "status": 2
+                },
+                {
+                    "executed": 1689887120,
+                    "status": 2
+                },
+                {
+                    "executed": 1689887210,
+                    "status": 2
+                },
+                {
+                    "executed": 1689887300,
+                    "status": 2
+                },
+                {
+                    "executed": 1689887390,
+                    "status": 2
+                },
+                {
+                    "executed": 1689887480,
+                    "status": 2
+                },
+                {
+                    "executed": 1689887570,
+                    "status": 2
+                },
+                {
+                    "executed": 1689887660,
+                    "status": 2
+                },
+                {
+                    "executed": 1689887751,
+                    "status": 2
+                },
+                {
+                    "executed": 1689887841,
+                    "status": 2
+                },
+                {
+                    "executed": 1689887931,
+                    "status": 2
+                },
+                {
+                    "executed": 1689888021,
+                    "status": 2
+                },
+                {
+                    "executed": 1689888111,
+                    "status": 2
+                },
+                {
+                    "executed": 1689888201,
+                    "status": 2
+                },
+                {
+                    "executed": 1689888291,
+                    "status": 2
+                },
+                {
+                    "executed": 1689888381,
+                    "status": 2
+                },
+                {
+                    "executed": 1689888471,
+                    "status": 2
+                }
+            ],
+            "interval": 90,
+            "is_silenced": false,
+            "issued": 1689888471,
+            "last_ok": 1681768268,
+            "low_flap_threshold": 20,
+            "metadata": {
+                "annotations": {
+                    "fatigue_check/allow_resolution": "true",
+                    "fatigue_check/interval": "3600",
+                    "fatigue_check/occurrences": "4",
+                    "slack_show_command_url": "true"
+                },
+                "labels": {
+                    "sensu.io/managed_by": "sensuctl"
+                },
+                "name": "check-http",
+                "namespace": "dev"
+            },
+            "occurrences": 90099,
+            "occurrences_watermark": 90099,
+            "output": "CheckHttp CRITICAL: 404\n",
+            "output_metric_format": "",
+            "output_metric_handlers": null,
+            "pipelines": [],
+            "processed_by": "dev-proxy-agent",
+            "proxy_entity_name": "atb-conservation-dev",
+            "proxy_requests": {
+                "entity_attributes": [
+                    "entity.entity_class == 'proxy'",
+                    "entity.labels.proxy_type == 'website'"
+                ],
+                "splay": false,
+                "splay_coverage": 0
+            },
+            "publish": true,
+            "round_robin": true,
+            "runtime_assets": [
+                "sensu-plugins/sensu-plugins-http",
+                "sensu/sensu-ruby-runtime"
+            ],
+            "scheduler": "",
+            "secrets": null,
+            "state": "failing",
+            "status": 2,
+            "stdin": false,
+            "subdue": null,
+            "subscriptions": [
+                "proxy"
+            ],
+            "timeout": 0,
+            "total_state_change": 0,
+            "ttl": 0
+        },
+        "entity": {
+            "deregister": false,
+            "deregistration": {},
+            "entity_class": "proxy",
+            "last_seen": 0,
+            "metadata": {
+                "annotations": {
+                    "deployed_from": "https://code.usgs.gov/sas/bioscience/atb-conservation"
+                },
+                "labels": {
+                    "proxy_type": "website",
+                    "sensu.io/managed_by": "sensuctl",
+                    "slack_channel": "bioscience-notices",
+                    "url": "https://maps-dev.snafu.cr.usgs.gov/atbconservation/explorer/"
+                },
+                "name": "atb-conservation-dev",
+                "namespace": "dev"
+            },
+            "sensu_agent_version": "",
+            "subscriptions": [
+                "proxy"
+            ],
+            "system": {
+                "cloud_provider": "",
+                "libc_type": "",
+                "network": {
+                    "interfaces": null
+                },
+                "processes": null,
+                "vm_role": "",
+                "vm_system": ""
+            }
+        },
+        "id": "7e1c0eda-1180-4835-b25e-7928e700ff4a",
+        "pipelines": null,
+        "sequence": 164783,
+        "timestamp": 1689888472
+    }
+}
