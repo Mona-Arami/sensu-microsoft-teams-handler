@@ -32,8 +32,17 @@ import json
 
 from datetime import datetime
 
+# add scripts to the path
+sys.path.append(
+    os.path.split(
+        os.path.dirname(
+            os.path.abspath(__file__)
+        )
+    )[0]
+)
 
-from pymsteams import connectorcard
+
+import pymsteams
 
 now = datetime.now()
 
