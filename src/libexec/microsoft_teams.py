@@ -31,9 +31,7 @@ import sys
 import json
 
 from datetime import datetime
-print("==================")
-print (os.path)
-print("==================")
+
 # add scripts to the path
 # PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # BASE_DIR = os.path.dirname(PROJECT_ROOT)
@@ -52,7 +50,7 @@ print("----------------")
 print (sys.path)
 print("----------------")
 
-from pymsteams import connectorcard
+import pymsteams
 
 now = datetime.now()
 
@@ -338,7 +336,7 @@ def main():
     print("web_url:",  config['webhook_url'])
     url = config['webhook_url']
 
-    myTeamsMessage = connectorcard(url)
+    myTeamsMessage = pymsteams.connectorcard(url)
     myTeamsMessage.text("SAS Sensu alerts , attempt # 4 ")
     myTeamsMessage.send()
 
