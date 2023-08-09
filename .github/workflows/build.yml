@@ -21,7 +21,7 @@ jobs:
         run: |
           cd src
           python -m pip install --upgrade pip wheel
-          python -m pip install -r requirements.txt --target lib/mspackage
+          python -m pip install -r requirements.txt --target lib
           ls -l
       - name: Create archive
         run: |

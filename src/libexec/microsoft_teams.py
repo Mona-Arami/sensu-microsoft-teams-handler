@@ -33,10 +33,14 @@ import json
 from datetime import datetime
 
 # add scripts to the path
-# PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-# BASE_DIR = os.path.dirname(PROJECT_ROOT)
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+print("PROJECT_ROOT", PROJECT_ROOT)
 
-# parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+BASE_DIR = os.path.dirname(PROJECT_ROOT)
+print("BASE_DIR", BASE_DIR)
+
+parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
+print("parentddir", parentddir)
 # sys.path.append(parentddir)
 
 sys.path.append(
