@@ -46,9 +46,11 @@ sys.path.append(PYMSTEAMS_PACKAGE_DIR)
 print("----------------")
 print (sys.path)
 print("----------------")
+print(sys.version)
+print("----------------")
 
 # from pymsteams import connectorcard
-import pymsteams
+import requests
 now = datetime.now()
 
 config = {
@@ -342,9 +344,15 @@ def main():
     url_ = config['webhook_url']
     url = "https://doimspp.webhook.office.com/webhookb2/c10a30a4-9b29-45ba-8f83-b2d5db3e2283@0693b5ba-4b18-4d7b-9341-f32f400a5494/IncomingWebhook/6a63494432cf4ac2af04970036ecba22/4642816a-abb2-426f-bffa-532f047efc62"
 
-    myTeamsMessage = pymsteams.connectorcard(url)
-    myTeamsMessage.text("SAS Sensu alerts , attempt # 6 ")
-    myTeamsMessage.send()
+    
+
+    def postTeamsMessage(text):
+            jsonData = {
+            "text": text
+            }
+            requests.post(url, json=jsonData)
+
+    postTeamsMessage("sas sensu alerts attept # 8")
 
 if __name__ == '__main__':
     main()
