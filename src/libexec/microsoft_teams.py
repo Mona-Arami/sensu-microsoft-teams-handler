@@ -38,7 +38,7 @@ print("PROJECT_ROOT", PROJECT_ROOT)
 sys.path.append(PROJECT_ROOT)
 
 BASE_DIR = os.path.dirname(PROJECT_ROOT)
-PYMSTEAMS_PACKAGE_DIR = BASE_DIR + "/lib/pymsteams"
+PYMSTEAMS_PACKAGE_DIR = BASE_DIR + "/lib"
 print("PYMSTEAMS_PACHAGE_DIR", PYMSTEAMS_PACKAGE_DIR)
 
 sys.path.append(PYMSTEAMS_PACKAGE_DIR)
@@ -343,7 +343,7 @@ def main():
     url = "https://doimspp.webhook.office.com/webhookb2/c10a30a4-9b29-45ba-8f83-b2d5db3e2283@0693b5ba-4b18-4d7b-9341-f32f400a5494/IncomingWebhook/6a63494432cf4ac2af04970036ecba22/4642816a-abb2-426f-bffa-532f047efc62"
 
     myTeamsMessage = pymsteams.connectorcard(url)
-    myTeamsMessage.text("SAS Sensu alerts , attempt # 5 ")
+    myTeamsMessage.text("SAS Sensu alerts , attempt # 6 ")
     myTeamsMessage.send()
 
 if __name__ == '__main__':
