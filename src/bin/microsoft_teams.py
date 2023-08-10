@@ -11,6 +11,6 @@ asset_path=$(dirname -- ${SCRIPTPATH})
 # to ensure modules are found.
 export PYTHONPATH="${asset_path}/lib:$PYTHONPATH"
 
-echo "PYTHONPATH="${asset_path}/lib:$PYTHONPATH""
+# echo "PYTHONPATH="${asset_path}/lib:$PYTHONPATH""
 program="${0##*/}"
 exec "${asset_path}/libexec/${program}" "$@"

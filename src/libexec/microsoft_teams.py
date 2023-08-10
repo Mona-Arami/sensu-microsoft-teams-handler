@@ -29,28 +29,10 @@ import os
 import re
 import sys
 import json
-
 from datetime import datetime
-
-# add scripts to the path
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-print("PROJECT_ROOT", PROJECT_ROOT)
-sys.path.append(PROJECT_ROOT)
-
-BASE_DIR = os.path.dirname(PROJECT_ROOT)
-PYMSTEAMS_PACKAGE_DIR = BASE_DIR + "/lib"
-print("PYMSTEAMS_PACHAGE_DIR", PYMSTEAMS_PACKAGE_DIR)
-
-sys.path.append(PYMSTEAMS_PACKAGE_DIR)
-
-print("----------------")
-print (sys.path)
-print("----------------")
-print(sys.version)
-print("----------------")
-
-# from pymsteams import connectorcard
 import requests
+
+
 now = datetime.now()
 
 config = {
@@ -260,19 +242,10 @@ def main():
     """
     Load the Sensu event data (stdin)
     """
-
-    with open('sample-event2.json') as f:
-        obj_all = json.load(f)
-
-
-
-    # data = ""
-    # test = '''{"SAS":"API","SDM":"API"}'''
-    # # for line in sys.stdin.readlines():
-    # for line in test:
-    #     data += "".join(line.strip())
-    # obj = json.loads(data)
-    obj = obj_all['spec']
+    data = ""
+    for line in sys.stdin.readlines():
+        data += "".join(line.strip())
+    obj = json.loads(data)
 
     channel = get_channel(obj['entity']['metadata'])
     namespace = obj['entity']['metadata']['namespace']
@@ -340,20 +313,24 @@ def main():
     #     text = message,
     #     icon_url = config['icon_url']
     # )
+    print("-----------------")
+    print (message)
+    print("-----------------")
     print("web_url:",  config['webhook_url'])
-    url_ = config['webhook_url']
-    url = "https://doimspp.webhook.office.com/webhookb2/c10a30a4-9b29-45ba-8f83-b2d5db3e2283@0693b5ba-4b18-4d7b-9341-f32f400a5494/IncomingWebhook/6a63494432cf4ac2af04970036ecba22/4642816a-abb2-426f-bffa-532f047efc62"
-
+    print("-----------------")
     
 
-    def postTeamsMessage(text):
-            jsonData = {
-            "text": text
-            }
-            requests.post(url, json=jsonData)
+def postTeamsMessage(text):
+        url = "https://doimspp.webhook.office.com/webhookb2/c10a30a4-9b29-45ba-8f83-b2d5db3e2283@0693b5ba-4b18-4d7b-9341-f32f400a5494/IncomingWebhook/6a63494432cf4ac2af04970036ecba22/4642816a-abb2-426f-bffa-532f047efc62"
 
-    postTeamsMessage("sas sensu alerts attept # 8")
+        jsonData = {
+        "text": text
+        }
+        requests.post(url, json=jsonData)
+
+    # postTeamsMessage("message attempt # 8")
 
 if __name__ == '__main__':
-    main()
+    # main()
+    postTeamsMessage("message attempt # 10")
 
