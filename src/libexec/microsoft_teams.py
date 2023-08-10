@@ -47,7 +47,8 @@ print("----------------")
 print (sys.path)
 print("----------------")
 
-from pymsteams import connectorcard
+# from pymsteams import connectorcard
+import pymsteams
 now = datetime.now()
 
 config = {
@@ -341,7 +342,7 @@ def main():
     url_ = config['webhook_url']
     url = "https://doimspp.webhook.office.com/webhookb2/c10a30a4-9b29-45ba-8f83-b2d5db3e2283@0693b5ba-4b18-4d7b-9341-f32f400a5494/IncomingWebhook/6a63494432cf4ac2af04970036ecba22/4642816a-abb2-426f-bffa-532f047efc62"
 
-    myTeamsMessage = connectorcard(url)
+    myTeamsMessage = pymsteams.connectorcard(url)
     myTeamsMessage.text("SAS Sensu alerts , attempt # 5 ")
     myTeamsMessage.send()
 
