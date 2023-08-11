@@ -275,7 +275,7 @@ def output_messsage (data,url):
     Generate markdown for the check name in the microsoft teams message
     This links it to the Sensu dashboard
     """
-    message += " - " + f"<{url}/c/~/n/{namespace}/events/{entity_name}/{check_name}|{check_name}>"
+    message += " - " + f"<{url}/c/~/n/{namespace}/events/{entity_name}/{check_name}>"
 
     """
     If a URL is in the check command, add a link to it in the microsoft teams message.
@@ -308,21 +308,48 @@ def output_messsage (data,url):
     
     return message
 
+
+    
+
 def main():
+    #start test
+    # with open('sample-event2.json') as f:
+    #     test_data = json.load(f)
+    # obj = test_data['spec']
+
+    # base_url = "https://sensu.xxxxxxxxx.cr.usgs.gov"
+    # web_url = "https:///webhookb2/"
+    # output_alert = output_messsage(obj,base_url)
+
+    # jsonData = {
+    #     "text": output_alert + "attempt # 2"
+    # }
+    # # requests.post(web_url, json=jsonData)
+    # response = requests.post(web_url, json=jsonData)
+    # print("-----------------")
+    # print("SAS Microsoft Teams Channels response status: ", response)
+    # print("-----------------")
+    #finish test
+
+
+    #start 
     event_data = get_event_data()
     env_var_dic = get_env_variables()
     output_alert = output_messsage(event_data,env_var_dic['sensu_url'])
 
     logging.debug("raw event data: %s " % str(event_data))
+    jsonData = {
+        "text": output_alert
+    }
+    #send alert message to alerts-outages MSteams channel
+    response_outages = requests.post(env_var_dic['outages_webhook_url'], json=jsonData)
+    #send alert message to apps MSteams channel
+    # response_apps = requests.post(web, json={"message": output_alert})
 
+    print("-----------------")
+    print("SAS Microsoft Teams Channels response status: ", response_outages)
     print("-----------------")
     print (output_alert)
     print("-----------------")
-
-    #send alert message to alerts-outages MSteams channel
-    requests.post(env_var_dic['outages_webhook_url'], json={"message": output_alert})
-    #send alert message to apps MSteams channel
-    # requests.post(web, json={"message": output_alert})
-
 if __name__ == '__main__':
     main()
