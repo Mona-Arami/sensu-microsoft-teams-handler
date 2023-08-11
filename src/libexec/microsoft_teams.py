@@ -34,20 +34,25 @@ import requests
 
 
 now = datetime.now()
+print(sys.path)
 
-#webhook url will assign in each entity metadata
-config = {
-    "webhook_url": os.environ.get('TEAMS_WEBHOOK_URL'),
-    "sensu_url": os.environ.get('SENSU_BASE_URL'),
-    "icon_url": os.environ.get('ICON_URL', 'https://docs.sensu.io/images/sensu-logo-icon-dark@2x.png')
-}
-
+def get_env_variables():
+    
+    config = {
+        #webhook url will assign in each entity metadata
+        "outages_webhook_url": os.environ.get('OUTAGES_TEAMS_WEBHOOK_URL'),
+        "sensu_url": os.environ.get('SENSU_BASE_URL'),
+        "icon_url": os.environ.get('ICON_URL', 'https://docs.sensu.io/images/sensu-logo-icon-dark@2x.png')
+    }
+    return config
 
 """
 List of emojis to map to an event status, using the Sensu/Nagios
 exit code (0=OK, 1=Warning, 2=Critical, 3=Unknown)
 """
 def emoji(status):
+    #status is int number , critical (2), 	 warning (1), 	 success (0), 	 unknown (3)
+
     emojis = [
         ':large_green_circle:',
         ':large_yellow_circle:',
@@ -213,11 +218,11 @@ def get_channel(metadata):
             #send alerts to main outages channel
             return os.environ.get('alerts-outages')
 
-def alert_duration(history, status):
+# def alert_duration(history, status):
     """
     Parse the history to display how long a check has been in its status or previous status
 
-    TODO: This is buggy and pretty limited in usefulness, since the Sensu alert
+    # TODO: This is buggy and pretty limited in usefulness, since the Sensu alert
     history is limited.
 
     :param history: The Sensu check's history from the event data
@@ -238,38 +243,39 @@ def alert_duration(history, status):
     #        #else:
     #        #    return "Alerting for " + duration
     ## Disabled for now
-    return ""
+    # return ""
 
-def main():
+def get_event_data():
     """
     Load the Sensu event data (stdin)
     """
     data = ""
     for line in sys.stdin.readlines():
         data += "".join(line.strip())
-    obj = json.loads(data)
-    print(obj.keys())
-    channel = get_channel(obj['entity']['metadata'])
-    namespace = obj['entity']['metadata']['namespace']
-    entity_name = obj['entity']['metadata']['name']
-    check_name = obj['check']['metadata']['name']
+    event_data = json.loads(data)
+    print(event_data.keys())
+    return event_data   
 
-    output = obj['check']['output']
+def output_messsage (data,url):
+    namespace = data['entity']['metadata']['namespace']
+    entity_name = data['entity']['metadata']['name']
+    check_name = data['check']['metadata']['name']
+    output = data['check']['output']
     output.replace('\n', ' ').replace('\r', '')
-
-    message = emoji(obj['check']['status'])
-
+    # status = data['check']['status']
+    message_emoji = emoji(data['check']['status'])
     """
     Generate markdown for the entity name in the microsoft teams message
     This links it to the Sensu dashboard
     """
-    message += " " + f"<{config['sensu_url']}/c/~/n/{namespace}/entities/{entity_name}/events|{entity_name}>"
+    message = message_emoji
+    message += " " + f"<{url}/c/~/n/{namespace}/entities/{entity_name}/events|{entity_name}>"
 
     """
     Generate markdown for the check name in the microsoft teams message
     This links it to the Sensu dashboard
     """
-    message += " - " + f"<{config['sensu_url']}/c/~/n/{namespace}/events/{entity_name}/{check_name}|{check_name}>"
+    message += " - " + f"<{url}/c/~/n/{namespace}/events/{entity_name}/{check_name}|{check_name}>"
 
     """
     If a URL is in the check command, add a link to it in the microsoft teams message.
@@ -278,42 +284,45 @@ def main():
     """
     s = False
     link_text = "(view site)"
-    if 'labels' in obj['check']['metadata']:
-        if 'microsoft_teams_link_command_url' in obj['check']['metadata']['labels']:
-            if obj['check']['metadata']['labels']['microsoft_teams_link_command_url'].lower() == "true":
+    if 'labels' in data['check']['metadata']:
+        if 'microsoft_teams_link_command_url' in data['check']['metadata']['labels']:
+            if data['check']['metadata']['labels']['microsoft_teams_link_command_url'].lower() == "true":
                 s = True
-                if 'microsoft_teams_link_command_text' in obj['check']['metadata']['labels']:
-                    link_text = obj['check']['metadata']['labels']['microsoft_teams_link_command_text']
-    if 'annotations' in obj['check']['metadata']:
-        if 'microsoft_teams_link_command_url' in obj['check']['metadata']['annotations']:
-            if obj['check']['metadata']['annotations']['microsoft_teams_link_command_url'].lower() == "true":
+                if 'microsoft_teams_link_command_text' in data['check']['metadata']['labels']:
+                    link_text = data['check']['metadata']['labels']['microsoft_teams_link_command_text']
+    if 'annotations' in data['check']['metadata']:
+        if 'microsoft_teams_link_command_url' in data['check']['metadata']['annotations']:
+            if data['check']['metadata']['annotations']['microsoft_teams_link_command_url'].lower() == "true":
                 s = True
-                if 'microsoft_teams_link_command_text' in obj['check']['metadata']['annotations']:
-                    link_text = obj['check']['metadata']['annotations']['microsoft_teams_link_command_text']
+                if 'microsoft_teams_link_command_text' in data['check']['metadata']['annotations']:
+                    link_text = data['check']['metadata']['annotations']['microsoft_teams_link_command_text']
 
     if s:
-        if 'https://' in obj['check']['command'] or 'http://' in obj['check']['command']:
+        if 'https://' in data['check']['command'] or 'http://' in data['check']['command']:
             # Match the first URL in the check command
-            check_url = re.findall(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", obj['check']['command'], re.I)[0]
+            check_url = re.findall(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", data['check']['command'], re.I)[0]
             # Creates a string like <https://foo/bar|(visit site)>
             message += " <" + check_url + "|" + link_text + ">"
 
     message += ": " + output.strip()
+    
+    return message
 
-    # Disabled for now
-    #if 'history' in obj['check']:
-    #    message += "; " + alert_duration(obj['check']['history'], obj['check']['status'])
+def main():
+    event_data = get_event_data()
+    env_var_dic = get_env_variables()
+    output_alert = output_messsage(event_data,env_var_dic['sensu_url'])
 
-    logging.debug("raw event data: %s " % str(obj))
+    logging.debug("raw event data: %s " % str(event_data))
 
     print("-----------------")
-    print (message)
+    print (output_alert)
     print("-----------------")
-    print("web_url:",  config['webhook_url'])
-    print("-----------------")
-    alert_data = {"message": message}
-    requests.post(config['webhook_url'], json=alert_data)
+
+    #send alert message to alerts-outages MSteams channel
+    requests.post(env_var_dic['outages_webhook_url'], json={"message": output_alert})
+    #send alert message to apps MSteams channel
+    # requests.post(web, json={"message": output_alert})
 
 if __name__ == '__main__':
     main()
-
