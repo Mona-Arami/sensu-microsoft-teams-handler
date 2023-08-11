@@ -246,7 +246,7 @@ def main():
     for line in sys.stdin.readlines():
         data += "".join(line.strip())
     obj = json.loads(data)
-
+    print(obj.keys())
     channel = get_channel(obj['entity']['metadata'])
     namespace = obj['entity']['metadata']['namespace']
     entity_name = obj['entity']['metadata']['name']
@@ -318,19 +318,20 @@ def main():
     print("-----------------")
     print("web_url:",  config['webhook_url'])
     print("-----------------")
-    
+    alert_data = {"message": message}
+    requests.post(config['webhook_url'], json=alert_data)
 
-def postTeamsMessage(text):
-        url = "https://doimspp.webhook.office.com/webhookb2/c10a30a4-9b29-45ba-8f83-b2d5db3e2283@0693b5ba-4b18-4d7b-9341-f32f400a5494/IncomingWebhook/6a63494432cf4ac2af04970036ecba22/4642816a-abb2-426f-bffa-532f047efc62"
 
-        jsonData = {
-        "text": text
-        }
-        requests.post(url, json=jsonData)
+# def postTeamsMessage(text):
+#         url = "https://.office.com/webhookb2/c10a30a4-9b29-45ba-8f83-b2d5db3e2283@0693b5ba-4b18-4d7b-9341-f32f400a5494/IncomingWebhook/6a63494432cf4ac2af04970036ecba22/4642816a-abb2-426f-bffa-532f047efc62"
 
-    # postTeamsMessage("message attempt # 8")
+#         jsonData = {
+#         "text": text
+#         }
+#         requests.post(url, json=jsonData)
+
 
 if __name__ == '__main__':
-    # main()
-    postTeamsMessage("message attempt # 10")
+    main()
+    # postTeamsMessage("message attempt # 10")
 
