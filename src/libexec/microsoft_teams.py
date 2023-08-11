@@ -35,12 +35,13 @@ import requests
 
 now = datetime.now()
 
+#webhook url will assign in each entity metadata
 config = {
     "webhook_url": os.environ.get('TEAMS_WEBHOOK_URL'),
     "sensu_url": os.environ.get('SENSU_BASE_URL'),
     "icon_url": os.environ.get('ICON_URL', 'https://docs.sensu.io/images/sensu-logo-icon-dark@2x.png')
 }
-print(config)
+
 
 """
 List of emojis to map to an event status, using the Sensu/Nagios
@@ -305,15 +306,6 @@ def main():
 
     logging.debug("raw event data: %s " % str(obj))
 
-    """
-    Post to Microsoft Teams
-    """
-    # class_microsofteams = MT(url=config['webhook_url'])
-    # class_microsofteams.messages(
-    #     title = "title",
-    #     text = message,
-    #     icon_url = config['icon_url']
-    # )
     print("-----------------")
     print (message)
     print("-----------------")
@@ -322,17 +314,6 @@ def main():
     alert_data = {"message": message}
     requests.post(config['webhook_url'], json=alert_data)
 
-
-# def postTeamsMessage(text):
-#         url = "https://.office.com/webhookb2/c10a30a4-9b29-45ba-8f83-b2d5db3e2283@0693b5ba-4b18-4d7b-9341-f32f400a5494/IncomingWebhook/6a63494432cf4ac2af04970036ecba22/4642816a-abb2-426f-bffa-532f047efc62"
-
-#         jsonData = {
-#         "text": text
-#         }
-#         requests.post(url, json=jsonData)
-
-
 if __name__ == '__main__':
     main()
-    # postTeamsMessage("message attempt # 10")
 
