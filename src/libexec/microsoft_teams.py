@@ -36,10 +36,11 @@ import requests
 now = datetime.now()
 
 config = {
-    "webhook_url": os.environ.get('TEST_WEBHOOK_URL'),
+    "webhook_url": os.environ.get('TEAMS_WEBHOOK_URL'),
     "sensu_url": os.environ.get('SENSU_BASE_URL'),
     "icon_url": os.environ.get('ICON_URL', 'https://docs.sensu.io/images/sensu-logo-icon-dark@2x.png')
 }
+print(config)
 
 """
 List of emojis to map to an event status, using the Sensu/Nagios
