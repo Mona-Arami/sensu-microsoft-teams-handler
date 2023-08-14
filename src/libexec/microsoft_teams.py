@@ -34,8 +34,9 @@ import requests
 
 
 now = datetime.now()
-print(sys.path)
-
+print("-----------")
+print(sys.path[0])
+print("-----------")
 def get_env_variables():
     
     config = {
@@ -50,148 +51,20 @@ def get_env_variables():
 List of emojis to map to an event status, using the Sensu/Nagios
 exit code (0=OK, 1=Warning, 2=Critical, 3=Unknown)
 """
-def emoji(status):
+def get_state(status):
     #status is int number , critical (2), 	 warning (1), 	 success (0), 	 unknown (3)
+    if status == 1:
+        state = "Warning"
+    elif status == 2:
+        state = "Critical"
+    elif status == 3:
+        state = "Unknown"
+    else:
+        state = "Success"
+    return state
 
-    emojis = [
-        ':large_green_circle:',
-        ':large_yellow_circle:',
-        ':red_circle:',
-        ':large_purple_circle:'
-    ]
-    return emojis[status]
-
-def pretty_date(time=False, since=now, relative=True):
-    """
-    Get a datetime object or a int() Epoch timestamp and return a
-    pretty string like 'an hour ago', 'Yesterday', '3 months ago',
-    'just now', etc
-    Adapted from https://stackoverflow.com/questions/1551382/user-friendly-time-format-in-python/1551394#1551394
-
-    :param time: the timestamp to parse
-    :param since: The current time as a datetime object
-    :param relative: Boolean toggling to return the time relative. E.g. "x ago"
-    :return: returns a string indicating how long ago a specific time was
-    """
-    if isinstance(time, int):
-        diff = since - datetime.fromtimestamp(time)
-    elif isinstance(time, datetime):
-        diff = since - time
-    elif not time:
-        diff = 0
-    second_diff = diff.seconds
-    day_diff = diff.days
-
-    if day_diff < 0:
-        return ''
-
-    if day_diff == 0:
-        if second_diff < 10:
-            the_time = str(second_diff)
-            if relative:
-                the_time = "just now"
-            else:
-                the_time += " seconds"
-            return the_time
-        if second_diff < 60:
-            the_time = str(second_diff)
-            if relative:
-                the_time = "seconds ago"
-            else:
-                the_time += " seconds"
-            return the_time
-        if second_diff < 120:
-            the_time = str(second_diff)
-            if relative:
-                the_time = "a minute ago"
-            else:
-                the_time += " seconds"
-            return the_time
-        if second_diff < 3600:
-            the_time = str(second_diff // 60)
-            the_time += " minute"
-            if (second_diff // 60) > 1:
-                the_time += "s"
-            if relative:
-                the_time += " ago"
-            return the_time
-        if second_diff < 7200:
-            the_time = str(second_diff // 60)
-            if relative:
-                the_time += "an hour ago"
-            else:
-                the_time += " minute"
-                if (second_diff // 6) > 1:
-                    the_time += "s"
-            return the_time
-        if second_diff < 86400:
-            the_time = str(second_diff // 3600)
-            the_time += " hour"
-            if (second_diff // 3600) > 1:
-                the_time += "s"
-            if relative:
-                the_time += " ago"
-            return the_time
-    if day_diff == 1:
-        the_time = str(second_diff // 3600)
-        the_time += " hour"
-        if (second_diff // 3600) > 1:
-            the_time += "s"
-        if relative:
-            the_time = "Yesterday"
-        return the_time
-    if day_diff < 7:
-        the_time = str(day_diff)
-        if relative:
-            the_time = " days ago"
-        else:
-            the_time += " days"
-        return the_time
-    if day_diff < 31:
-        the_time = str(day_diff // 7)
-        the_time += " week"
-        if (day_diff // 7) > 1:
-            the_time += "s"
-        if relative:
-            the_time += " ago"
-        return the_time
-    if day_diff < 365:
-        the_time = str(day_diff // 30)
-        the_time += " month"
-        if (day_diff // 30) > 1:
-            the_time += "s"
-        if relative:
-            the_time += " ago"
-        return the_time
-    if day_diff >= 365:
-        the_time = str(day_diff // 365)
-        the_time += " year"
-        if (day_diff // 365) > 1:
-            the_time += "s"
-        if relative:
-            the_time += " ago"
-        return the_time
-
-def parse_history(history):
-    """
-    Parse event history to determine the delta between the previous (bad) status
-    and when it first began.
-    This returns a list of the previous failed checks since the last OK
-
-    :param history: The Sensu check's history from the event data
-    :return: returns a list of the most recent failed checks since the last passing
-    """
-    history.reverse()
-    bad_checks = []
-    for i, x in enumerate(history):
-        if i == 0 and x['status'] == 0:
-            continue
-
-        if x['status'] != 0:
-            bad_checks.append(x)
-        else:
-            break
-    return(bad_checks)
+def convert_time():
+    return "'"
 
 def get_channel(metadata):
     """
@@ -218,32 +91,6 @@ def get_channel(metadata):
             #send alerts to main outages channel
             return os.environ.get('alerts-outages')
 
-# def alert_duration(history, status):
-    """
-    Parse the history to display how long a check has been in its status or previous status
-
-    # TODO: This is buggy and pretty limited in usefulness, since the Sensu alert
-    history is limited.
-
-    :param history: The Sensu check's history from the event data
-    :param status: The Sensu check status (as int) from event metadata
-    :return: returns a string with how long a check has alerted
-    """
-    #for i, hist in enumerate(history):
-    #    if i == 0:
-    #        if int(hist['status']) == 0:
-    #            continue
-    #    bad_history = parse_history(history)
-    #    if len(bad_history) > 1:
-    #        bad_first = datetime.fromtimestamp(bad_history[-1]['executed'])
-    #        bad_last = datetime.fromtimestamp(bad_history[0]['executed'])
-    #        #duration = str(pretty_date(bad_first, bad_last, False))
-    #        #if status is 0:
-    #        #    return "Alerted for " + duration
-    #        #else:
-    #        #    return "Alerting for " + duration
-    ## Disabled for now
-    # return ""
 
 def get_event_data():
     """
@@ -256,31 +103,26 @@ def get_event_data():
     print(event_data.keys())
     return event_data   
 
-def output_messsage (data,url):
+def get_sensu_url (data,b_url):
+    #https://sensu.snafu.cr.usgs.gov/c/~/n/dev/events/atb-conservation-beta/check-http
     namespace = data['entity']['metadata']['namespace']
     entity_name = data['entity']['metadata']['name']
     check_name = data['check']['metadata']['name']
-    output = data['check']['output']
-    output.replace('\n', ' ').replace('\r', '')
-    # status = data['check']['status']
-    message_emoji = emoji(data['check']['status'])
     """
     Generate markdown for the entity name in the microsoft teams message
     This links it to the Sensu dashboard
     """
-    message = message_emoji
-    message += " " + f"<{url}/c/~/n/{namespace}/entities/{entity_name}/events|{entity_name}>"
+    # sensu_url = f"{b_url}/c/~/n/{namespace}/entities/{entity_name}/events|{entity_name}"
 
     """
     Generate markdown for the check name in the microsoft teams message
     This links it to the Sensu dashboard
     """
-    message += " - " + f"<{url}/c/~/n/{namespace}/events/{entity_name}/{check_name}>"
-
+    sensu_url = ""
+    # sensu_url = f"<{b_url}/c/~/n/{namespace}/events/{entity_name}/{check_name}>"
+    sensu_url += f"{b_url}/c/~/n/{namespace}/events/{entity_name}/{check_name}"
     """
-    If a URL is in the check command, add a link to it in the microsoft teams message.
-    This is disabled by default and can be enabled per-check by setting a
-    label or annotation called 'microsoft_teams_link_command_url' to 'True' (bool)
+    handel value for "microsoft_teams_link_command_text" , 'microsoft_teams_link_command_url' to 'True' (bool)
     """
     s = False
     link_text = "(view site)"
@@ -290,6 +132,7 @@ def output_messsage (data,url):
                 s = True
                 if 'microsoft_teams_link_command_text' in data['check']['metadata']['labels']:
                     link_text = data['check']['metadata']['labels']['microsoft_teams_link_command_text']
+   
     if 'annotations' in data['check']['metadata']:
         if 'microsoft_teams_link_command_url' in data['check']['metadata']['annotations']:
             if data['check']['metadata']['annotations']['microsoft_teams_link_command_url'].lower() == "true":
@@ -297,16 +140,16 @@ def output_messsage (data,url):
                 if 'microsoft_teams_link_command_text' in data['check']['metadata']['annotations']:
                     link_text = data['check']['metadata']['annotations']['microsoft_teams_link_command_text']
 
+    
     if s:
         if 'https://' in data['check']['command'] or 'http://' in data['check']['command']:
             # Match the first URL in the check command
             check_url = re.findall(r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\(\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+", data['check']['command'], re.I)[0]
             # Creates a string like <https://foo/bar|(visit site)>
-            message += " <" + check_url + "|" + link_text + ">"
+            sensu_url += " <" + check_url + "|" + link_text + ">"
 
-    message += ": " + output.strip()
     
-    return message
+    return sensu_url
 
 
     
@@ -316,16 +159,44 @@ def main():
     # with open('sample-event2.json') as f:
     #     test_data = json.load(f)
     # obj = test_data['spec']
+    # web_url = "https://xxx.webhook.office.com/"
+    # base_url = "https:xxxxx"
+    # sensu_url = get_sensu_url(obj,base_url)
+    # args = [obj['entity']['metadata']['namespace'],
+    #         obj['entity']['metadata']['name'],
+    #         obj['entity']['entity_class'],
+    #         obj['check']['metadata']['name'],
+    #         obj['check']['state'],
+    #         obj['entity']['metadata']['labels']['proxy_type'],
+    #         obj['entity']['metadata']['labels']['url'],
+    #         obj['check']['output'].replace('\n', ' ').replace('\r', ''),
+    #         sensu_url
+    #         ]
 
-    # base_url = "https://sensu.xxxxxxxxx.cr.usgs.gov"
-    # web_url = "https:///webhookb2/"
-    # output_alert = output_messsage(obj,base_url)
+    # card_load = {
+    # "text":'''{8}
 
-    # jsonData = {
-    #     "text": output_alert + "attempt # 2"
+    #     Sensu Event
+    #     -------------------------------
+    #     NameSpace     {0}
+    #     Entity        {1}
+    #     Class         {2}
+    #     Check         {3}
+    #     State         {4}
+    #     Proxy Type    {5}
+    #     URL           {6}
+    #     Output        {7}
+    # '''.format(*args)
     # }
-    # # requests.post(web_url, json=jsonData)
-    # response = requests.post(web_url, json=jsonData)
+
+    # d = json.dumps(card_load)
+    # print("ddddddddd", d)
+    # headers = {"Content-Type": "application/json"}
+    
+    # print("-----------------")
+    # response = requests.post(web_url, json=card_load, headers=headers)
+    # requests.post(web_url, data=json.dumps(card_load),headers=headers)
+
     # print("-----------------")
     # print("SAS Microsoft Teams Channels response status: ", response)
     # print("-----------------")
@@ -335,21 +206,45 @@ def main():
     #start 
     event_data = get_event_data()
     env_var_dic = get_env_variables()
-    output_alert = output_messsage(event_data,env_var_dic['sensu_url'])
+    sensu_url = get_sensu_url(event_data,env_var_dic['sensu_url'])
+    args = [event_data['entity']['metadata']['namespace'],
+            event_data['entity']['metadata']['name'],
+            event_data['entity']['entity_class'],
+            event_data['check']['metadata']['name'],
+            event_data['check']['state'],
+            event_data['entity']['metadata']['labels']['proxy_type'],
+            event_data['entity']['metadata']['labels']['url'],
+            event_data['check']['output'].replace('\n', ' ').replace('\r', ''),
+            sensu_url
+            ]
+    card_load = {
+    "text":'''{8}
 
-    logging.debug("raw event data: %s " % str(event_data))
-    jsonData = {
-        "text": output_alert
+        Sensu Event
+        -------------------------------
+        NameSpace     {0}
+        Entity        {1}
+        Class         {2}
+        Check         {3}
+        State         {4}
+        Proxy Type    {5}
+        URL           {6}
+        Output        {7}
+    '''.format(*args)
     }
-    #send alert message to alerts-outages MSteams channel
-    response_outages = requests.post(env_var_dic['outages_webhook_url'], json=jsonData)
-    #send alert message to apps MSteams channel
-    # response_apps = requests.post(web, json={"message": output_alert})
+    logging.debug("raw event data: %s " % str(event_data))
+    # jsonData = {
+    #     "text": output_alert
+    # }
+    headers = {"Content-Type": "application/json"}
+    # #send alert message to alerts-outages MSteams channel
+    response_outages = requests.post(env_var_dic['outages_webhook_url'], json=card_load, headers=headers)
+    # #send alert message to apps MSteams channel
+    # # response_apps = requests.post(web, json={"message": output_alert})
 
     print("-----------------")
     print("SAS Microsoft Teams Channels response status: ", response_outages)
     print("-----------------")
-    print (output_alert)
-    print("-----------------")
+
 if __name__ == '__main__':
     main()
