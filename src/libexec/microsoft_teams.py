@@ -36,60 +36,19 @@ import requests
 now = datetime.now()
 print("-----------")
 print(sys.path[0])
-print("-----------")
+
 def get_env_variables():
     
     config = {
         #webhook url will assign in each entity metadata
         "outages_webhook_url": os.environ.get('OUTAGES_TEAMS_WEBHOOK_URL'),
-        "sensu_url": os.environ.get('SENSU_BASE_URL'),
+        "b_sensu_url": os.environ.get('SENSU_BASE_URL'),
         "icon_url": os.environ.get('ICON_URL', 'https://docs.sensu.io/images/sensu-logo-icon-dark@2x.png')
     }
     return config
 
-"""
-List of emojis to map to an event status, using the Sensu/Nagios
-exit code (0=OK, 1=Warning, 2=Critical, 3=Unknown)
-"""
-def get_state(status):
-    #status is int number , critical (2), 	 warning (1), 	 success (0), 	 unknown (3)
-    if status == 1:
-        state = "Warning"
-    elif status == 2:
-        state = "Critical"
-    elif status == 3:
-        state = "Unknown"
-    else:
-        state = "Success"
-    return state
-
-def convert_time():
-    return "'"
-
-def get_channel(metadata):
-    """
-    Find a microsoft teams channel to use in labels, annotations, or an environment
-    variable.
-
-    :param metadata: The Sensu event metadata containing labels or annotations
-    :return: returns a string with the microsoft teams channel to alert to
-    """
-    if 'annotations' in metadata:
-        annotations = metadata['annotations']
-        if 'teams_channel' in annotations:
-            return annotations['teams_channel']
-        elif 'teams-channel' in annotations:
-            return annotations['teams-channel']
-
-    if 'labels' in metadata:
-        labels = metadata['labels']
-        if 'teams_channel' in labels:
-            return labels['teams_channel']
-        elif 'teams-channel' in labels:
-            return labels['teams-channel']
-        else:
-            #send alerts to main outages channel
-            return os.environ.get('alerts-outages')
+def get_issued_at(unix_date_format):
+    return datetime.utcfromtimestamp(unix_date_format).strftime('%B %d %Y %H:%M:%S')
 
 
 def get_event_data():
@@ -157,11 +116,14 @@ def get_sensu_url (data,b_url):
 def main():
     #start test
     # with open('sample-event2.json') as f:
-    #     test_data = json.load(f)
-    # obj = test_data['spec']
-    # web_url = "https://xxx.webhook.office.com/"
-    # base_url = "https:xxxxx"
+    # with open('metrics-dev.json') as f:
+    #     m_data = json.load(f)
+    # obj = m_data['spec']
+    # web_url = "xxx"
+    # base_url = "xxx"
     # sensu_url = get_sensu_url(obj,base_url)
+    # issued_at = get_issued_at(obj['check']['issued'])
+
     # args = [obj['entity']['metadata']['namespace'],
     #         obj['entity']['metadata']['name'],
     #         obj['entity']['entity_class'],
@@ -169,12 +131,13 @@ def main():
     #         obj['check']['state'],
     #         obj['entity']['metadata']['labels']['proxy_type'],
     #         obj['entity']['metadata']['labels']['url'],
+    #         issued_at,
     #         obj['check']['output'].replace('\n', ' ').replace('\r', ''),
     #         sensu_url
     #         ]
 
     # card_load = {
-    # "text":'''{8}
+    # "text":'''{9}
 
     #     Sensu Event
     #     -------------------------------
@@ -185,28 +148,36 @@ def main():
     #     State         {4}
     #     Proxy Type    {5}
     #     URL           {6}
-    #     Output        {7}
+    #     Issued at     {7}
+    #     Output        {8}
     # '''.format(*args)
     # }
 
-    # d = json.dumps(card_load)
-    # print("ddddddddd", d)
+    # #send post request to MS teams
     # headers = {"Content-Type": "application/json"}
-    
-    # print("-----------------")
     # response = requests.post(web_url, json=card_load, headers=headers)
-    # requests.post(web_url, data=json.dumps(card_load),headers=headers)
+    # print("-----------------")
+    # print("alerts-outages-sensu MT Channel response status: ", response)
 
-    # print("-----------------")
-    # print("SAS Microsoft Teams Channels response status: ", response)
-    # print("-----------------")
+    # #find individulas app channels webhook
+    # if 'labels' in obj['entity']['metadata']:
+    #     if 'teams_webhook' in obj['entity']['metadata']['labels']:
+    #         app_webhook_url = obj['entity']['metadata']['labels']['teams_webhook']
+    #         app_channel_name = obj['entity']['metadata']['labels']['teams_channel']
+    #         response = requests.post(app_webhook_url, json=card_load, headers=headers)
+    #         print("-----------------")
+    #         print(app_channel_name , "MS Channel response status: ", response)
+    
+    
+    
     #finish test
 
 
     #start 
     event_data = get_event_data()
     env_var_dic = get_env_variables()
-    sensu_url = get_sensu_url(event_data,env_var_dic['sensu_url'])
+    sensu_url = get_sensu_url(event_data,env_var_dic['b_sensu_url'])
+    issued_at = get_issued_at(event_data['check']['issued'])
     args = [event_data['entity']['metadata']['namespace'],
             event_data['entity']['metadata']['name'],
             event_data['entity']['entity_class'],
@@ -214,11 +185,12 @@ def main():
             event_data['check']['state'],
             event_data['entity']['metadata']['labels']['proxy_type'],
             event_data['entity']['metadata']['labels']['url'],
+            issued_at,
             event_data['check']['output'].replace('\n', ' ').replace('\r', ''),
             sensu_url
             ]
     card_load = {
-    "text":'''{8}
+    "text":'''{9}
 
         Sensu Event
         -------------------------------
@@ -229,22 +201,26 @@ def main():
         State         {4}
         Proxy Type    {5}
         URL           {6}
-        Output        {7}
+        Issued at     {7}
+        Output        {8}
     '''.format(*args)
     }
     logging.debug("raw event data: %s " % str(event_data))
-    # jsonData = {
-    #     "text": output_alert
-    # }
+ 
     headers = {"Content-Type": "application/json"}
-    # #send alert message to alerts-outages MSteams channel
+    #send alert message to alerts-outages MSteams channel
     response_outages = requests.post(env_var_dic['outages_webhook_url'], json=card_load, headers=headers)
-    # #send alert message to apps MSteams channel
-    # # response_apps = requests.post(web, json={"message": output_alert})
+    print("-----------------")
+    print("alerts-outages-sensu MT Channel response status: ", response_outages)
 
-    print("-----------------")
-    print("SAS Microsoft Teams Channels response status: ", response_outages)
-    print("-----------------")
+    #find individulas app channels webhook
+    if 'labels' in obj['entity']['metadata']:
+        if 'teams_webhook' in event_data['entity']['metadata']['labels']:
+            app_webhook_url = event_data['entity']['metadata']['labels']['teams_webhook']
+            app_channel_name = event_data['entity']['metadata']['labels']['teams_channel']
+            response_app = requests.post(app_webhook_url, json=card_load, headers=headers)
+            print("-----------------")
+            print(app_channel_name , "MS Channel response status: ", response_app)
 
 if __name__ == '__main__':
     main()
