@@ -178,13 +178,22 @@ def main():
     env_var_dic = get_env_variables()
     sensu_url = get_sensu_url(event_data,env_var_dic['b_sensu_url'])
     issued_at = get_issued_at(event_data['check']['issued'])
+    if event_data['entity']['metadata']['labels']['proxy_type']:
+        proxy_type = event_data['entity']['metadata']['labels']['proxy_type']
+    else:
+        proxy_type = "unknown"
+    
+    if event_data['entity']['metadata']['labels']['url']:
+        scaned_url = event_data['entity']['metadata']['labels']['url']
+    else:
+        scaned_url = "unknown"
     args = [event_data['entity']['metadata']['namespace'],
             event_data['entity']['metadata']['name'],
             event_data['entity']['entity_class'],
             event_data['check']['metadata']['name'],
             event_data['check']['state'],
-            event_data['entity']['metadata']['labels']['proxy_type'],
-            event_data['entity']['metadata']['labels']['url'],
+            proxy_type,
+            scaned_url,
             issued_at,
             event_data['check']['output'].replace('\n', ' ').replace('\r', ''),
             sensu_url
@@ -214,7 +223,7 @@ def main():
     print("alerts-outages-sensu MT Channel response status: ", response_outages)
 
     #find individulas app channels webhook
-    if 'labels' in obj['entity']['metadata']:
+    if 'labels' in event_data['entity']['metadata']:
         if 'teams_webhook' in event_data['entity']['metadata']['labels']:
             app_webhook_url = event_data['entity']['metadata']['labels']['teams_webhook']
             app_channel_name = event_data['entity']['metadata']['labels']['teams_channel']
