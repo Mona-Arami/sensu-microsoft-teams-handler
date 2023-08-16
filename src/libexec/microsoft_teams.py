@@ -48,7 +48,7 @@ def get_env_variables():
     return config
 
 def get_issued_at(unix_date_format):
-    return datetime.utcfromtimestamp(unix_date_format).strftime('%B %d %Y %H:%M:%S')
+    return datetime.utcfromtimestamp(unix_date_format).strftime('%B %d %Y %H:%M:%S %Z')
 
 
 def get_event_data():
@@ -113,81 +113,27 @@ def get_sensu_url (data,b_url):
     
 
 def main():
-    #start test
-    # with open('sample-event2.json') as f:
-    # with open('metrics-dev.json') as f:
-    #     m_data = json.load(f)
-    # obj = m_data['spec']
-    # web_url = "xxx"
-    # base_url = "xxx"
-    # sensu_url = get_sensu_url(obj,base_url)
-    # issued_at = get_issued_at(obj['check']['issued'])
-
-    # args = [obj['entity']['metadata']['namespace'],
-    #         obj['entity']['metadata']['name'],
-    #         obj['entity']['entity_class'],
-    #         obj['check']['metadata']['name'],
-    #         obj['check']['state'],
-    #         obj['entity']['metadata']['labels']['proxy_type'],
-    #         obj['entity']['metadata']['labels']['url'],
-    #         issued_at,
-    #         obj['check']['output'].replace('\n', ' ').replace('\r', ''),
-    #         sensu_url
-    #         ]
-
-    # card_load = {
-    # "text":'''{9}
-
-    #     Sensu Event
-    #     -------------------------------
-    #     NameSpace     {0}
-    #     Entity        {1}
-    #     Class         {2}
-    #     Check         {3}
-    #     State         {4}
-    #     Proxy Type    {5}
-    #     URL           {6}
-    #     Issued at     {7}
-    #     Output        {8}
-    # '''.format(*args)
-    # }
-
-    # #send post request to MS teams
-    # headers = {"Content-Type": "application/json"}
-    # response = requests.post(web_url, json=card_load, headers=headers)
-    # print("-----------------")
-    # print("alerts-outages-sensu MT Channel response status: ", response)
-
-    # #find individulas app channels webhook
-    # if 'labels' in obj['entity']['metadata']:
-    #     if 'teams_webhook' in obj['entity']['metadata']['labels']:
-    #         app_webhook_url = obj['entity']['metadata']['labels']['teams_webhook']
-    #         app_channel_name = obj['entity']['metadata']['labels']['teams_channel']
-    #         response = requests.post(app_webhook_url, json=card_load, headers=headers)
-    #         print("-----------------")
-    #         print(app_channel_name , "MS Channel response status: ", response)
     
-    
-    
-    #finish test
-
-
-    #start 
     event_data = get_event_data()
     env_var_dic = get_env_variables()
     sensu_url = get_sensu_url(event_data,env_var_dic['b_sensu_url'])
     issued_at = get_issued_at(event_data['check']['issued'])
+    print("-----------------")
+    print("entity name: ", event_data['entity']['metadata']['name'])
     if 'labels' in event_data['entity']['metadata']:
         if 'proxy_type' in event_data['entity']['metadata']['labels']:
             proxy_type = event_data['entity']['metadata']['labels']['proxy_type']
+        else:
+            proxy_type = "unknown"
     else:
-        proxy_type = "unknown"
+        print("No lable or proxy_type exist in this entity", event_data['entity']['metadata'])        
+   
     
     if 'labels' in event_data['entity']['metadata']:
         if 'url' in event_data['entity']['metadata']['labels']:
             scaned_url = event_data['entity']['metadata']['labels']['url']
-    else:
-        scaned_url = "unknown"
+        else:
+            scaned_url = "unknown"
 
     args = [event_data['entity']['metadata']['namespace'],
             event_data['entity']['metadata']['name'],
