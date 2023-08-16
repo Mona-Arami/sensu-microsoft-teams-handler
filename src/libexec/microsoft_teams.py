@@ -59,7 +59,6 @@ def get_event_data():
     for line in sys.stdin.readlines():
         data += "".join(line.strip())
     event_data = json.loads(data)
-    print(event_data.keys())
     return event_data   
 
 def get_sensu_url (data,b_url):
@@ -178,15 +177,18 @@ def main():
     env_var_dic = get_env_variables()
     sensu_url = get_sensu_url(event_data,env_var_dic['b_sensu_url'])
     issued_at = get_issued_at(event_data['check']['issued'])
-    if event_data['entity']['metadata']['labels']['proxy_type']:
-        proxy_type = event_data['entity']['metadata']['labels']['proxy_type']
+    if 'labels' in event_data['entity']['metadata']:
+        if 'proxy_type' in event_data['entity']['metadata']['labels']:
+            proxy_type = event_data['entity']['metadata']['labels']['proxy_type']
     else:
         proxy_type = "unknown"
     
-    if event_data['entity']['metadata']['labels']['url']:
-        scaned_url = event_data['entity']['metadata']['labels']['url']
+    if 'labels' in event_data['entity']['metadata']:
+        if 'url' in event_data['entity']['metadata']['labels']:
+            scaned_url = event_data['entity']['metadata']['labels']['url']
     else:
         scaned_url = "unknown"
+
     args = [event_data['entity']['metadata']['namespace'],
             event_data['entity']['metadata']['name'],
             event_data['entity']['entity_class'],
