@@ -29,7 +29,7 @@ import os
 import re
 import sys
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 import requests
 
 
@@ -42,13 +42,16 @@ def get_env_variables():
     config = {
         #webhook url will assign in each entity metadata
         "outages_webhook_url": os.environ.get('OUTAGES_TEAMS_WEBHOOK_URL'),
+        "ssl_webhook_url": os.environ.get('SSL_EXPIRE_TEAMS_WEBHOOK_URL'),
         "b_sensu_url": os.environ.get('SENSU_BASE_URL'),
         "icon_url": os.environ.get('ICON_URL', 'https://docs.sensu.io/images/sensu-logo-icon-dark@2x.png')
     }
     return config
 
 def get_issued_at(unix_date_format):
-    return datetime.utcfromtimestamp(unix_date_format).strftime('%B %d %Y %H:%M:%S %Z')
+    d = datetime.utcfromtimestamp(unix_date_format) - timedelta(hours=6)
+    d_d = d.strftime('%B %d %Y %H:%M:%S')
+    return d_d
 
 
 def get_event_data():
@@ -109,7 +112,14 @@ def get_sensu_url (data,b_url):
     
     return sensu_url
 
-
+def emoji(status):
+    emojis = [
+        '\U0001F7E2',
+        '\U0001F7E1',
+        '\U0001F534',
+        '\U0001F7E3'
+    ]
+    return emojis[status]
     
 
 def main():
@@ -135,7 +145,9 @@ def main():
         else:
             scaned_url = "unknown"
 
-    args = [event_data['entity']['metadata']['namespace'],
+    args = [sensu_url,
+            emoji(event_data['check']['status']),        
+            event_data['entity']['metadata']['namespace'],
             event_data['entity']['metadata']['name'],
             event_data['entity']['entity_class'],
             event_data['check']['metadata']['name'],
@@ -144,22 +156,21 @@ def main():
             scaned_url,
             issued_at,
             event_data['check']['output'].replace('\n', ' ').replace('\r', ''),
-            sensu_url
             ]
     card_load = {
-    "text":'''{9}
+    "text":'''{0}
 
-        Sensu Event
+        {1} Sensu Event
         -------------------------------
-        NameSpace     {0}
-        Entity        {1}
-        Class         {2}
-        Check         {3}
-        State         {4}
-        Proxy Type    {5}
-        URL           {6}
-        Issued at     {7}
-        Output        {8}
+        NameSpace     {2}
+        Entity        {3}
+        Class         {4}
+        Check         {5}
+        State         {6}
+        Proxy Type    {7}
+        URL           {8}
+        Issued at     {9}
+        Output        {10}
     '''.format(*args)
     }
     logging.debug("raw event data: %s " % str(event_data))
@@ -178,6 +189,12 @@ def main():
             response_app = requests.post(app_webhook_url, json=card_load, headers=headers)
             print("-----------------")
             print(app_channel_name , "MS Channel response status: ", response_app)
+    
+    #post additional alerts to MS teams SSL expire channel 
+    if 'SSL' in event_data['check']['output']:
+            response = requests.post(env_var_dic['ssl_webhook_url'], json=card_load, headers=headers)
+            print("-----------------")
+            print("SSL MS Channel response status: ", response)
 
 if __name__ == '__main__':
     main()
