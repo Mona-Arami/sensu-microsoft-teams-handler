@@ -162,10 +162,9 @@ def main():
     </head>
     <body>
     <span><h1 style='font-weight: bold;'>{1}    {6} </h1>
-    <p>Sensu {5} ran on {3} in {2} environment at {9}</p>
+    <p>Sensu <b>{5}</b> ran on <b>{3}</b> in {2} environment at {9}</p>
     <p>{10}</p>
-    <a style='font-weight: bold;' href={0}>Check the Sensu Event Link</a><br>
-    <a style='font-weight: bold;' href={8}>Check the Application Link</a>
+    <a style='font-weight: bold;' href={0}>Check the Sensu Event Link</a> | <a style='font-weight: bold;' href={8}>Check the Application Link</a>
     </body>
     </html>"""
     
