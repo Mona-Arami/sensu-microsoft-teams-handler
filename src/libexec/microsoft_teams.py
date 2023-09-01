@@ -114,9 +114,9 @@ def get_sensu_url (data,b_url):
 
 def emoji(status):
     emojis = [
-        '\U0001F7E2',
-        '\U0001F7E1',
-        '\U0001F534',
+        '\U0001F7E2', 
+        '\U0001F7E1', # Warning Sign \U00026A0
+        '\U0001F534', #critical 
         '\U0001F7E3'
     ]
     return emojis[status]
@@ -157,21 +157,20 @@ def main():
             issued_at,
             event_data['check']['output'].replace('\n', ' ').replace('\r', ''),
             ]
+    html = """<html>
+    <head>
+    </head>
+    <body>
+    <span><h1 style='font-weight: bold;'>{1}    {6} </h1>
+    <p>Sensu {5} ran on {3} in {2} environment at {9}</p>
+    <p>{10}</p>
+    <a style='font-weight: bold;' href={0}>Check the Sensu Event Link</a><br>
+    <a style='font-weight: bold;' href={8}>Check the Application Link</a>
+    </body>
+    </html>"""
+    
     card_load = {
-    "text":'''{0}
-
-        {1} Sensu Event
-        -------------------------------
-        NameSpace     {2}
-        Entity        {3}
-        Class         {4}
-        Check         {5}
-        State         {6}
-        Proxy Type    {7}
-        URL           {8}
-        Issued at     {9}
-        Output        {10}
-    '''.format(*args)
+    "text": html.format(*args)
     }
     logging.debug("raw event data: %s " % str(event_data))
  
